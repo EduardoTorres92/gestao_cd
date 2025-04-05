@@ -102,36 +102,38 @@ def exibir_graficos():
     st.pyplot(fig)
 
     # -----------------------
-    # LEAD TIME DIÁRIO POR MARCA
+    # LEAD TIME DIÁRIO - GRÁFICO ÚNICO COM TODAS AS MARCAS
     # -----------------------
 
-    st.title("Lead Time Diário por Marca")
+    st.subheader("Lead Time Diário por Marca")
 
-    marcas = leadtime_diario["marca"].unique()
+    leadtime_agrupado = leadtime_diario.groupby(["dt_emis_nf", "marca"])["TMO_EXPEDICAO"].mean().reset_index()
 
-    for marca in marcas:
-        st.subheader(f"Lead Time Diário - {marca}")
+    fig, ax = plt.subplots(figsize=(14, 6))
 
-        df_marca = leadtime_diario[leadtime_diario["marca"] == marca]
-        leadtime_diario_marca = df_marca.groupby("dt_emis_nf")["TMO_EXPEDICAO"].mean().round(2)
+        barplot = sns.barplot(
+            data=leadtime_agrupado,
+            x="dt_emis_nf",
+            y="TMO_EXPEDICAO",
+            hue="marca",
+            palette=CORES_MARCA
+        )
 
-        fig, ax = plt.subplots(figsize=(12, 5))
-
-        cor = CORES_MARCA.get(marca, "blue")
-        paleta = [cor] * len(leadtime_diario_marca)
-
-        sns.barplot(x=leadtime_diario_marca.index.astype(str), 
-                    y=leadtime_diario_marca.values, 
-                    ax=ax, 
-                    palette=paleta)
-
-        for x, y in enumerate(leadtime_diario_marca.values):
-            ax.annotate(f"{y:.2f}", (x, y), textcoords="offset points", xytext=(0,5), ha='center', fontsize=9, color="black")
-
-        ax.set_title(f"Lead Time Diário - {marca}", fontsize=12, fontweight="bold")
+        ax.set_title("Lead Time Diário por Marca", fontsize=14, fontweight="bold")
+        ax.set_xlabel("Data")
         ax.set_ylabel("Dias")
-        ax.set_xlabel("")
         ax.grid(axis="y", linestyle="--", alpha=0.6)
-        ax.set_xticklabels(leadtime_diario_marca.index.strftime("%d-%m"), rotation=45)
+        ax.set_xticklabels(leadtime_agrupado["dt_emis_nf"].dt.strftime("%d-%m").unique(), rotation=45)
+
+        # 💬 Adicionar valor no topo de cada barra
+        for bar in barplot.patches:
+            height = bar.get_height()
+            if height > 0:
+                ax.annotate(f'{height:.2f}',
+                            xy=(bar.get_x() + bar.get_width() / 2, height),
+                            xytext=(0, 5),  # distância do topo da barra
+                            textcoords='offset points',
+                            ha='center', va='bottom',
+                            fontsize=8, color='black')
 
         st.pyplot(fig)
