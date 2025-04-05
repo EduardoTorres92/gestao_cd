@@ -111,29 +111,29 @@ def exibir_graficos():
 
     fig, ax = plt.subplots(figsize=(14, 6))
 
-        barplot = sns.barplot(
-            data=leadtime_agrupado,
-            x="dt_emis_nf",
-            y="TMO_EXPEDICAO",
-            hue="marca",
-            palette=CORES_MARCA
-        )
+    barplot = sns.barplot(
+        data=leadtime_agrupado,
+        x="dt_emis_nf",
+        y="TMO_EXPEDICAO",
+        hue="marca",
+        palette=CORES_MARCA
+    )
 
-        ax.set_title("Lead Time Diário por Marca", fontsize=14, fontweight="bold")
-        ax.set_xlabel("Data")
-        ax.set_ylabel("Dias")
-        ax.grid(axis="y", linestyle="--", alpha=0.6)
-        ax.set_xticklabels(leadtime_agrupado["dt_emis_nf"].dt.strftime("%d-%m").unique(), rotation=45)
+    ax.set_title("Lead Time Diário por Marca", fontsize=14, fontweight="bold")
+    ax.set_xlabel("Data")
+    ax.set_ylabel("Dias")
+    ax.grid(axis="y", linestyle="--", alpha=0.6)
+    ax.set_xticklabels(leadtime_agrupado["dt_emis_nf"].dt.strftime("%d-%m").unique(), rotation=45)
 
-        # 💬 Adicionar valor no topo de cada barra
-        for bar in barplot.patches:
-            height = bar.get_height()
-            if height > 0:
-                ax.annotate(f'{height:.2f}',
-                            xy=(bar.get_x() + bar.get_width() / 2, height),
-                            xytext=(0, 5),  # distância do topo da barra
-                            textcoords='offset points',
-                            ha='center', va='bottom',
-                            fontsize=8, color='black')
+    # 💬 Adicionar valor no topo de cada barra
+    for bar in barplot.patches:
+        height = bar.get_height()
+        if height > 0:
+            ax.annotate(f'{height:.2f}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 5),  # distância do topo da barra
+                        textcoords='offset points',
+                        ha='center', va='bottom',
+                        fontsize=8, color='black')
 
-        st.pyplot(fig)
+    st.pyplot(fig)
